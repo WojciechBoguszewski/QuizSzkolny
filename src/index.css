@@ -1,0 +1,8 @@
+:root {
+  color-scheme: light;
+  background: #fafaf7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+body { margin: 0; }
+#root { min-height: 100svh; }

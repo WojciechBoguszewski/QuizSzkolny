@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>QuizSzkolny — podgląd</title>
+    <link rel="stylesheet" href="../src/styles/quiz.css" />
+    <style>body { margin: 0; }</style>
+  </head>
+  <body>
+    <div class="qs-app">
+      <a class="qs-skip-link" href="#question">Przejdź do pytania</a>
+      <div class="qs-shell">
+        <header class="qs-header">
+          <span class="qs-brand">QuizSzkolny</span>
+          <span class="qs-preview-label">Podgląd</span>
+        </header>
+        <main class="qs-main" id="question">
+          <div class="qs-question__meta">
+            <p>Nazwa quizu</p>
+            <p class="qs-question__count" aria-label="Pytanie 5 z 12"><strong>05</strong> / 12</p>
+          </div>
+          <h1 class="qs-question__title" id="question-title">Tutaj pojawi się treść pytania.</h1>
+          <p class="qs-question__hint">Wybierz jedną odpowiedź.</p>
+          <fieldset class="qs-options" aria-labelledby="question-title">
+            <legend class="qs-sr-only">Odpowiedzi przykładowe</legend>
+            <label class="qs-option">
+              <input type="radio" name="preview-answer" value="a" />
+              <span class="qs-option__letter" aria-hidden="true">A</span>
+              <span class="qs-option__text">Pierwsza odpowiedź</span>
+            </label>
+            <label class="qs-option">
+              <input type="radio" name="preview-answer" value="b" checked />
+              <span class="qs-option__letter" aria-hidden="true">B</span>
+              <span class="qs-option__text">Druga odpowiedź</span>
+            </label>
+            <label class="qs-option">
+              <input type="radio" name="preview-answer" value="c" />
+              <span class="qs-option__letter" aria-hidden="true">C</span>
+              <span class="qs-option__text">Dłuższa odpowiedź, która może zająć kilka wierszy.</span>
+            </label>
+            <label class="qs-option">
+              <input type="radio" name="preview-answer" value="d" />
+              <span class="qs-option__letter" aria-hidden="true">D</span>
+              <span class="qs-option__text">Czwarta odpowiedź</span>
+            </label>
+          </fieldset>
+          <!-- Navigation is a visual specimen. Connect handlers in the actual quiz. -->
+          <div class="qs-actions" aria-label="Przykładowe przyciski nawigacji">
+            <button type="button" class="qs-button qs-button--ghost">Wstecz</button>
+            <button type="button" class="qs-button qs-button--primary">Dalej</button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
