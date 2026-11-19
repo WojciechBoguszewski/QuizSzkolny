@@ -25,7 +25,7 @@ function QuizViews({ route, quiz, catalog, account, onRetry }) {
     return (
       <>
         <h1 className="qs-page-title">Nie znaleziono quizu.</h1>
-        <div className="qs-actions"><a href="#quizy">Wróć do quizów</a></div>
+        <div className="qs-actions"><a href="#quizy">Wróć na start</a></div>
       </>
     )
   }

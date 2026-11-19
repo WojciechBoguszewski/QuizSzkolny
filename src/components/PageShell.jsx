@@ -9,7 +9,7 @@ export default function PageShell({ children, showBack = false, signedIn = false
         <header className="qs-header">
           <a className="qs-brand" href="#quizy">QuizSzkolny</a>
           <nav aria-label="Menu">
-            {showBack && <a className="qs-header-link" href="#quizy">Quizy</a>}
+            {showBack && <a className="qs-header-link" href="#quizy">Start</a>}
             <a className="qs-header-link" href="#konto">{signedIn ? 'Konto' : 'Zaloguj się'}</a>
           </nav>
         </header>

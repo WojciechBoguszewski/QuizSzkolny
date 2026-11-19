@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { aptitudeQuiz, scoreAptitudeQuiz } from '../data/aptitude-quiz.js'
+import { aptitudeDemo, scoreAptitudeQuiz } from '../data/aptitude-quiz.js'
 import { advanceQuiz, orderedQuestions, scoreQuiz } from '../lib/quiz-model.js'
+import ScoreChart from './ScoreChart.jsx'
 
 function ResetConfirmation({ onConfirm, onCancel, pending }) {
   const heading = useRef(null)
@@ -64,26 +65,6 @@ function AnswerReview({ result }) {
   )
 }
 
-function ScoreChart({ scores, title }) {
-  return (
-    <section className="qs-score-chart" aria-labelledby="score-chart-title">
-      <h2 id="score-chart-title">{title}</h2>
-      <ul>
-        {scores.map(({ name, points, max }) => (
-          <li key={name}>
-            <div className="qs-score-label">
-              <span>{name}</span><span>{points} / {max} pkt</span>
-            </div>
-            <div className="qs-score-track" aria-hidden="true">
-              <div style={{ width: `${100 * points / max}%` }} />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
 export default function QuizSession({ quiz, attempt, isCloud }) {
   const { progress, setProgress, resetProgress, retrySave, saveStatus } = attempt
   const [confirmRestart, setConfirmRestart] = useState(false)
@@ -124,7 +105,7 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
         <h1 className="qs-page-title" ref={heading} tabIndex={-1}>Nie można przywrócić postępu.</h1>
         <p className="qs-page-intro">Poprzedni zapis nie pasuje do tej wersji quizu lub jest uszkodzony. Został zachowany.</p>
         <div className="qs-actions">
-          <a className="qs-button qs-button--ghost" href="#quizy">Wróć do quizów</a>
+          <a className="qs-button qs-button--ghost" href="#quizy">Wróć na start</a>
           <button type="button" className="qs-button qs-button--primary" ref={restartButton} onClick={() => setConfirmRestart(true)}>Zacznij od nowa</button>
         </div>
         {confirmRestart && <ResetConfirmation onConfirm={restart} onCancel={cancelRestart} pending={restartPending} />}
@@ -134,12 +115,15 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
 
   if (progress.finished) {
     const result = scoreQuiz(quiz, progress)
-    const isAptitudeQuiz = quiz === aptitudeQuiz
+    const aptitudeScores = scoreAptitudeQuiz(quiz, progress.answers)
+    const resultLabel = aptitudeScores
+      ? quiz === aptitudeDemo ? 'Wersja pokazowa · 20 pytań' : 'Pełna wersja · 94 pytania'
+      : quiz.title
     return (
       <>
-        <p className="qs-section-label">{quiz.title}</p>
-        <h1 className="qs-page-title" ref={heading} tabIndex={-1}>{isAptitudeQuiz ? 'Wynik kwestionariusza' : 'Quiz ukończony.'}</h1>
-        {isAptitudeQuiz ? <ScoreChart scores={scoreAptitudeQuiz(progress.answers)} title="Wynik według kategorii" /> : (
+        <p className="qs-section-label">{resultLabel}</p>
+        <h1 className="qs-page-title" ref={heading} tabIndex={-1}>{aptitudeScores ? 'Wynik kwestionariusza' : 'Quiz ukończony.'}</h1>
+        {aptitudeScores ? <ScoreChart scores={aptitudeScores} title="Wynik według kategorii" /> : (
           <div className="qs-result">
             <p className="qs-result-number qs-number">
               {result.graded > 0 ? result.points : result.answered} / {result.graded > 0 ? result.maxPoints : result.total}
@@ -153,7 +137,7 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
         {result.skills.length > 0 && <ScoreChart scores={result.skills} title="Wynik według umiejętności" />}
         <AnswerReview result={result} />
         <div className="qs-actions">
-          <a className="qs-button qs-button--ghost" href="#quizy">Wróć do quizów</a>
+          <a className="qs-button qs-button--ghost" href="#quizy">Wróć na start</a>
           <button type="button" className="qs-button qs-button--primary" ref={restartButton} onClick={() => setConfirmRestart(true)}>Jeszcze raz</button>
         </div>
         <SaveNotice status={saveStatus} onRetry={retrySave} canRestart={false} isCloud={isCloud} />
@@ -169,6 +153,9 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
         <p className="qs-question__count" aria-label={`Pytanie ${progress.questionIndex + 1} z ${questions.length}`}>
           {progress.questionIndex + 1} / {questions.length}
         </p>
+      </div>
+      <div className="qs-question__progress" aria-hidden="true">
+        <div style={{ width: `${100 * (progress.questionIndex + 1) / questions.length}%` }} />
       </div>
       <h1 className="qs-question__title" id="question-title" ref={heading} tabIndex={-1}>{question.text}</h1>
       <p className="qs-question__hint" id="question-hint">

@@ -72,7 +72,7 @@ export default function AccountPage({ account }) {
         <p className="qs-page-intro" role="status">
           {status === 'loading' ? 'Wczytywanie konta…' : 'Logowanie jest chwilowo niedostępne. Quizy działają w trybie gościa.'}
         </p>
-        <div className="qs-actions"><a href="#quizy">Wróć do quizów</a></div>
+        <div className="qs-actions"><a href="#quizy">Wróć na start</a></div>
       </>
     )
   }
@@ -84,7 +84,7 @@ export default function AccountPage({ account }) {
         <p className="qs-page-intro">Zalogowano jako {user.email}.</p>
         {error && <p className="qs-feedback" data-state="error" role="alert">{error}</p>}
         <div className="qs-actions">
-          <a href="#quizy">Wróć do quizów</a>
+          <a href="#quizy">Wróć na start</a>
           <button type="button" className="qs-button" disabled={pending} onClick={logout}>Wyloguj się</button>
         </div>
       </>

@@ -1,8 +1,8 @@
 # QuizSzkolny
 
-Quizy szkolne z matematyki, informatyki i języka polskiego oraz kwestionariusz uzdolnień.
-Pytania przedmiotowe mają przypisane umiejętności i wagi. Na końcu aplikacja pokazuje
-sumę punktów, wykres słupkowy oraz podgląd odpowiedzi z wyjaśnieniami.
+Szkolny kwestionariusz uzdolnień. Start prowadzi do wersji pokazowej z 20 pytaniami
+w pięciu kategoriach. Pełny kwestionariusz ma 94 stwierdzenia w 13 kategoriach.
+Obie wersje pokazują wykres radarowy, liczbę punktów i listę odpowiedzi.
 
 Gość wznawia próbę w tej samej przeglądarce. Zalogowana osoba może wrócić do niej
 na innym urządzeniu dzięki Firebase Authentication i Cloud Firestore.
@@ -36,8 +36,9 @@ Produkcyjna konfiguracja Firebase pochodzi ze zmiennej repozytorium `FIREBASE_WE
 
 ## Dane i punktacja
 
-Quizy przedmiotowe są w `src/data/subject-quizzes.js`. Opcjonalne zewnętrzne źródło
-wskazuje `VITE_QUIZ_DATA_URL`. [Format katalogu](docs/DATA_FORMAT.md)
+Stwierdzenia są w `src/data/quizzes.js`, a wybór wersji pokazowej i punktacja
+w `src/data/aptitude-quiz.js`. Wersja pokazowa korzysta z czterech stwierdzeń na kategorię
+i zapisuje własną próbę. Opcjonalne zewnętrzne źródło wskazuje `VITE_QUIZ_DATA_URL`. [Format katalogu](docs/DATA_FORMAT.md)
 
 Kwestionariusz wykorzystuje punktację skali IZiU z rozdziału 7.1.1 publikacji
 [„Zdolny, ale jak?”](https://repozytorium.uwb.edu.pl/jspui/handle/11320/3449).

@@ -1,9 +1,11 @@
 .qs-app {
-  --ink: #172033;
-  --muted: #505b6c;
-  --line: #dce1e8;
-  --accent: #234b94;
-  --selected: #f1f5fc;
+  --paper: #faf9f5;
+  --ink: #202a23;
+  --muted: #526055;
+  --line: #dbdfd5;
+  --accent: #245944;
+  --selected: #eef2eb;
+  --heading-font: Georgia, 'Times New Roman', serif;
   --error: #9a2626;
   color: var(--ink);
   font: 1rem / 1.5 system-ui, sans-serif;
@@ -48,23 +50,49 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 4rem;
+  min-height: 4.5rem;
   border-bottom: 1px solid var(--line);
 }
 
-.qs-brand { color: var(--ink); font-weight: 700; text-decoration: none; }
+.qs-brand { color: var(--ink); font: 700 1.2rem / 1.2 var(--heading-font); text-decoration: none; }
 .qs-header nav { display: flex; flex-wrap: wrap; gap: .75rem; }
-.qs-header-link { padding-block: .7rem; }
+.qs-header-link { padding-block: .7rem; font-size: .9rem; }
 .qs-main { padding-top: clamp(1.5rem, 5vw, 3rem); }
 .qs-main:focus, .qs-main :where(h1, h2):focus { outline: none; }
 
 .qs-page-title, .qs-question__title {
-  font-size: clamp(1.45rem, 4vw, 2rem);
-  line-height: 1.25;
+  font-family: var(--heading-font);
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.23;
   overflow-wrap: anywhere;
 }
 
-.qs-question__title { margin-top: .75rem; white-space: pre-line; }
+.qs-home {
+  margin-inline: auto;
+  padding-block: clamp(2.25rem, 9vh, 5rem) 2.25rem;
+  text-align: center;
+}
+
+.qs-home-meta { color: var(--accent); font-size: .9rem; }
+.qs-home h1 {
+  margin-top: .65rem;
+  font: 400 clamp(2.45rem, 7vw, 4.3rem) / 1.06 var(--heading-font);
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.qs-home-description { max-width: 34ch; margin: 1rem auto 0; color: var(--muted); text-wrap: pretty; }
+.qs-home-start { margin-block: 1.65rem 2.2rem; }
+.qs-home-start .qs-button { min-width: 9rem; }
+.qs-home-full { font-size: .9rem; color: var(--muted); }
+
+.qs-question__title {
+  margin-top: 1.35rem;
+  font-size: clamp(1.55rem, 3.8vw, 2.1rem);
+  white-space: pre-line;
+}
+.qs-question__progress { height: 3px; margin-top: .7rem; background: var(--line); }
+.qs-question__progress > div { height: 100%; background: var(--accent); }
 .qs-page-intro, .qs-question__hint { margin-top: .75rem; }
 
 .qs-question__meta {
@@ -106,6 +134,7 @@
 }
 
 .qs-option:hover, .qs-option:has(input:checked) { background: var(--selected); }
+.qs-option:has(input:checked) { border-bottom-color: #a7bcad; }
 .qs-option input { flex: none; width: 1.125rem; height: 1.125rem; margin: 0; accent-color: var(--accent); }
 .qs-option__text { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
 
@@ -133,9 +162,9 @@
 }
 
 .qs-button--primary { color: white; background: var(--accent); }
-.qs-button--primary:hover { background: #193973; }
+.qs-button--primary:hover { background: #1c4837; }
 .qs-button--ghost:hover, .qs-button--secondary:hover { background: var(--selected); }
-.qs-button:disabled { border-color: var(--line); color: var(--muted); background: #f1f2f4; cursor: default; }
+.qs-button:disabled { border-color: var(--line); color: var(--muted); background: #efefe9; cursor: default; }
 
 .qs-empty { margin-top: 1rem; }
 .qs-empty .qs-button { margin-top: .75rem; }
@@ -176,13 +205,61 @@
 
 .qs-result { margin: 1rem 0; }
 .qs-result-number { font-size: 2rem; font-weight: 700; }
-.qs-score-chart { margin-block: 1.25rem; }
-.qs-score-chart h2 { font-size: 1.15rem; }
-.qs-score-chart ul { display: grid; gap: .85rem; margin: .75rem 0 0; padding: 0; list-style: none; }
-.qs-score-label { display: flex; justify-content: space-between; gap: .75rem; font-size: .95rem; }
+.qs-score-chart { margin-block: 1.35rem; }
+.qs-score-chart h2 { font-size: 1rem; font-weight: 600; }
+.qs-radar {
+  display: block;
+  width: min(100%, 25rem);
+  height: auto;
+  margin: .25rem auto .55rem;
+  overflow: visible;
+}
+.qs-radar-grid, .qs-radar-axis { fill: none; stroke: #cbd5ca; }
+.qs-radar-result {
+  fill: #61957a;
+  fill-opacity: .29;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.qs-radar-point { fill: var(--accent); stroke: var(--paper); stroke-width: 1.25; }
+.qs-radar-tick {
+  fill: var(--muted);
+  stroke: var(--paper);
+  stroke-width: 2.5;
+  paint-order: stroke;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.qs-radar-label, .qs-radar-index { fill: var(--ink); font-size: 13px; font-weight: 600; }
+.qs-radar-index { display: none; font-size: 16px; }
+.qs-score-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 0 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.qs-score-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .75rem;
+  padding-block: .55rem;
+  border-top: 1px solid var(--line);
+  font-size: .875rem;
+}
+.qs-score-label > :first-child { min-width: 0; overflow-wrap: anywhere; }
 .qs-score-label > :last-child { flex-shrink: 0; color: var(--muted); }
-.qs-score-track { height: .65rem; margin-top: .3rem; background: var(--line); }
-.qs-score-track > div { height: 100%; background: var(--accent); }
+.qs-score-index { display: none; color: var(--accent); }
+.qs-score-chart--numbered .qs-radar-label { display: none; }
+.qs-score-chart--numbered :where(.qs-radar-index, .qs-score-index) { display: inline; }
+
+@media (max-width: 41rem) {
+  .qs-radar-label { display: none; }
+  .qs-radar-index, .qs-score-index { display: inline; }
+}
 
 .qs-account-form { display: grid; gap: 1rem; max-width: 28rem; margin-top: 1.25rem; }
 .qs-account-form label { display: grid; gap: .3rem; }
@@ -209,7 +286,12 @@
 .qs-reset .qs-feedback { margin-top: .5rem; }
 
 @media (forced-colors: active) {
-  .qs-score-track { border: 1px solid CanvasText; }
-  .qs-score-track > div { background: Highlight; forced-color-adjust: none; }
+  .qs-radar-grid, .qs-radar-axis { stroke: GrayText; }
+  .qs-radar-result { fill: Highlight; stroke: Highlight; }
+  .qs-radar-point { fill: Highlight; stroke: Canvas; }
+  .qs-radar-tick, .qs-radar-label, .qs-radar-index { fill: CanvasText; }
+  .qs-radar-tick { stroke: Canvas; }
+  .qs-question__progress { outline: 1px solid CanvasText; }
+  .qs-question__progress > div { background: Highlight; forced-color-adjust: none; }
   .qs-option:has(input:checked) { outline: 1px solid Highlight; }
 }

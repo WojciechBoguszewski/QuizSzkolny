@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadQuizCatalog } from './quiz-source.js'
+import { quizSaveKey } from '../lib/quiz-model.js'
 import { scoreAptitudeQuiz } from './aptitude-quiz.js'
 
 const data = { quizzes: [{ id: 'test', title: 'Test', questions: [{
@@ -13,7 +14,7 @@ test('the built-in catalog opens without configuration or a network request', as
     request: () => { throw new Error('Unexpected request') },
   })
   assert.equal(status, 'ready')
-  assert.deepEqual(quizzes.map(({ id }) => id), ['matematyka', 'informatyka', 'jezyk-polski', 'uzdolnienia'])
+  assert.deepEqual(quizzes.map(({ id }) => id), ['uzdolnienia-demo', 'uzdolnienia'])
   const quiz = quizzes.at(-1)
   assert.equal(quiz.id, 'uzdolnienia')
   assert.deepEqual(quiz.questions.map(({ id }) => Number(id)), Array.from({ length: 94 }, (_, i) => i + 1))
@@ -24,13 +25,28 @@ test('the questionnaire totals all 13 categories and reverses the four marked st
   const { quizzes } = await loadQuizCatalog()
   const quiz = quizzes.at(-1)
   const answers = Object.fromEntries(quiz.questions.map(({ id }) => [id, '4']))
-  const results = scoreAptitudeQuiz(answers)
+  const results = scoreAptitudeQuiz(quiz, answers)
   assert.equal(results.length, 13)
   assert.equal(results.reduce((sum, { max }) => sum + max, 0), 376)
   assert.deepEqual(results.filter(({ points, max }) => points !== max), [
     { name: 'Przywódcze', points: 24, max: 32 },
     { name: 'Językowe', points: 28, max: 32 },
     { name: 'Literackie', points: 24, max: 28 },
+  ])
+})
+
+test('the demo uses 20 existing statements and has a separate save from the full questionnaire', async () => {
+  const { quizzes: [demo, full] } = await loadQuizCatalog()
+  assert.equal(demo.questions.length, 20)
+  assert.notEqual(quizSaveKey(demo), quizSaveKey(full))
+  assert.ok(demo.questions.every((question) => full.questions.some(({ id, text }) => id === question.id && text === question.text)))
+  const answers = Object.fromEntries(demo.questions.map(({ id }) => [id, '4']))
+  assert.deepEqual(scoreAptitudeQuiz(demo, answers), [
+    { name: 'Matematyczne', points: 16, max: 16 },
+    { name: 'Technologiczno-informatyczne', points: 16, max: 16 },
+    { name: 'Przyrodnicze', points: 16, max: 16 },
+    { name: 'Twórcze', points: 16, max: 16 },
+    { name: 'Językowe', points: 12, max: 16 },
   ])
 })
 

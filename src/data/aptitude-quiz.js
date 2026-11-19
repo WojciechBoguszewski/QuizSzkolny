@@ -25,26 +25,52 @@ const categoryNames = new Map([
   ['sportowe', 'Sportowe'],
 ])
 
-export const [aptitudeQuiz] = parseQuizCatalog({
-  quizzes: [{
-    id: 'uzdolnienia',
+// Cztery stwierdzenia na kategorię, w kolejności pełnego kwestionariusza.
+const demoIds = new Set([
+  25, 49, 73, 84, // Matematyczne
+  1, 14, 62, 85, // Technologiczno-informatyczne
+  2, 15, 38, 74, // Przyrodnicze
+  4, 16, 52, 88, // Twórcze
+  7, 19, 43, 67, // Językowe
+])
+const demoQuestions = aptitudeQuestions.filter(({ id }) => demoIds.has(id))
+const description = 'Oceń, w jakim stopniu każde stwierdzenie do Ciebie pasuje.'
+
+function questionnaire(id, questions) {
+  return {
+    id,
     title: 'Kwestionariusz uzdolnień',
-    description: 'Oceń, w jakim stopniu każde stwierdzenie do Ciebie pasuje.',
-    questions: aptitudeQuestions.map(({ id, text }) => ({ id: String(id), text, options })),
-  }],
+    description,
+    questions: questions.map(({ id: questionId, text }) => ({ id: String(questionId), text, options })),
+  }
+}
+
+export const [aptitudeDemo, aptitudeQuiz] = parseQuizCatalog({
+  quizzes: [
+    questionnaire('uzdolnienia-demo', demoQuestions),
+    questionnaire('uzdolnienia', aptitudeQuestions),
+  ],
 })
 
+const questionsByQuiz = new Map([
+  [aptitudeDemo, demoQuestions],
+  [aptitudeQuiz, aptitudeQuestions],
+])
+
 // Wywoływane po ukończeniu ankiety, kiedy każda odpowiedź przeszła walidację.
-export function scoreAptitudeQuiz(answers) {
-  const categories = new Map(Array.from(categoryNames, ([id, name]) => [
-    id, { name, points: 0, max: 0 },
-  ]))
+export function scoreAptitudeQuiz(quiz, answers) {
+  const questions = questionsByQuiz.get(quiz)
+  if (!questions) return null
+
+  const categories = new Map()
   const maxPoints = options.length - 1
-  for (const { id, category, isReversed } of aptitudeQuestions) {
-    const result = categories.get(category)
+  for (const { id, category, isReversed } of questions) {
+    const result = categories.get(category) ?? { name: categoryNames.get(category), points: 0, max: 0 }
     const points = Number(answers[id])
     result.points += isReversed ? maxPoints - points : points
     result.max += maxPoints
+    categories.set(category, result)
   }
-  return [...categories.values()]
+
+  return [...categoryNames.keys()].filter((category) => categories.has(category)).map((category) => categories.get(category))
 }
