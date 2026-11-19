@@ -6,9 +6,9 @@ const useEmulators = import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULAT
 let clientPromise
 function loadClient() {
   clientPromise ??= import('./client.js').then(({ createFirebaseClient }) => {
-    const config = configured
-      ? JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG)
-      : { apiKey: 'demo-quizszkolny', projectId: 'demo-quizszkolny' }
+    const config = useEmulators
+      ? { apiKey: 'demo-quizszkolny', projectId: 'demo-quizszkolny' }
+      : JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG)
     return createFirebaseClient(config, useEmulators)
   })
   return clientPromise
