@@ -1,12 +1,15 @@
 # QuizSzkolny
 
-Szkolny kwestionariusz uzdolnień. Zawiera 94 stwierdzenia, pięć odpowiedzi do wyboru
-i podsumowanie punktów w 13 kategoriach. Odpowiedzi i bieżące pytanie zapisują się
-w przeglądarce, więc próbę można dokończyć po odświeżeniu strony.
+Quizy szkolne z matematyki, informatyki i języka polskiego oraz kwestionariusz uzdolnień.
+Pytania przedmiotowe mają przypisane umiejętności i wagi. Na końcu aplikacja pokazuje
+sumę punktów, wykres słupkowy oraz podgląd odpowiedzi z wyjaśnieniami.
 
-Punktacja skali IZiU pochodzi z rozdziału 7.1.1 publikacji
-[„Zdolny, ale jak?”](https://repozytorium.uwb.edu.pl/jspui/handle/11320/3449).
-Podsumowanie pokazuje sumy punktów w kategoriach.
+Gość wznawia próbę w tej samej przeglądarce. Zalogowana osoba może wrócić do niej
+na innym urządzeniu dzięki Firebase Authentication i Cloud Firestore.
+
+- [Strona projektu](https://wojciechboguszewski.github.io/QuizSzkolny/)
+- [Scenariusz prezentacji](docs/PREZENTACJA.md)
+- [Konfiguracja Firebase](docs/FIREBASE.md)
 
 ## Uruchomienie
 
@@ -17,22 +20,24 @@ npm ci
 npm run dev
 ```
 
-## Sprawdzenie i publikacja
+Quizy działają w trybie gościa bez konfiguracji Firebase. Aby włączyć logowanie lokalnie,
+uzupełnij `VITE_FIREBASE_CONFIG` w pliku `.env.local` albo użyj emulatorów Firebase.
+
+## Testy i publikacja
 
 ```sh
 npm test
 npm run lint
 npm run build
-npm run preview
 ```
 
-W ustawieniach repozytorium wybierz **Settings → Pages → Source → GitHub Actions**.
-Automatyzacja **GitHub Pages** testuje i buduje projekt po zmianach na `main`,
-a następnie publikuje katalog `dist/`. Można ją również uruchomić ręcznie z karty **Actions**.
+GitHub Actions publikuje katalog `dist/` na GitHub Pages po zmianach na `main`.
+Produkcyjna konfiguracja Firebase pochodzi ze zmiennej repozytorium `FIREBASE_WEB_CONFIG`.
 
-## Inne źródło danych
+## Dane i punktacja
 
-Wbudowany kwestionariusz działa bez konfiguracji. Aby wyświetlić inny katalog, ustaw
-`VITE_QUIZ_DATA_URL` w pliku `.env.local` przed uruchomieniem lub budową aplikacji.
-Przy hostowaniu w podkatalogu podawaj pełny adres źródła albo ścieżkę względną
-wobec strony. Format opisano w [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
+Quizy przedmiotowe są w `src/data/subject-quizzes.js`. Opcjonalne zewnętrzne źródło
+wskazuje `VITE_QUIZ_DATA_URL`. [Format katalogu](docs/DATA_FORMAT.md)
+
+Kwestionariusz wykorzystuje punktację skali IZiU z rozdziału 7.1.1 publikacji
+[„Zdolny, ale jak?”](https://repozytorium.uwb.edu.pl/jspui/handle/11320/3449).

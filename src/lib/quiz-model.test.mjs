@@ -32,6 +32,8 @@ test('bad envelopes, empty questions, missing options and unknown answer keys ar
     (data) => { data.quizzes[0].questions[0].options = [] },
     (data) => { data.quizzes[0].questions[0].text = ' ' },
     (data) => { data.quizzes[0].questions[0].correctOptionId = 'unknown' },
+    (data) => { data.quizzes[0].questions[0].points = -2 },
+    (data) => { data.quizzes[0].questions[0].points = '2' },
   ]) {
     const data = payload()
     change(data)
@@ -127,6 +129,23 @@ test('scoring excludes ungraded questions and distinguishes unanswered from wron
   assert.equal(wrong.rows[0].correctAnswer.id, 'b')
 })
 
+test('skill results use question weights and exclude questions without a key', () => {
+  const data = payload()
+  const [first, second] = data.quizzes[0].questions
+  Object.assign(first, { points: 2, skill: 'Równania' })
+  Object.assign(second, { points: 3, skill: 'Geometria' })
+  data.quizzes[0].questions.push({ ...second, id: 'q3', correctOptionId: 'a' })
+  const current = parseQuizCatalog(data)[0]
+  const initial = createQuizStore(current, { storage: memoryStorage() }).getSnapshot().progress
+  const result = scoreQuiz(current, { ...initial, answers: { q1: 'b', q2: 'a', q3: 'b' } })
+  assert.equal(result.points, 2)
+  assert.equal(result.maxPoints, 5)
+  assert.deepEqual(result.skills, [
+    { name: 'Równania', points: 2, max: 2 },
+    { name: 'Geometria', points: 0, max: 3 },
+  ])
+})
+
 test('special IDs are handled as data, without prototype collisions', () => {
   const data = payload()
   data.quizzes[0].id = 'żółć / 1'
@@ -141,6 +160,7 @@ test('special IDs are handled as data, without prototype collisions', () => {
 
 test('hash routes support reloads, encoded IDs and malformed links without throwing', () => {
   assert.deepEqual(readQuizRoute(quizHref('żółć / 1')), { kind: 'quiz', id: 'żółć / 1' })
+  assert.deepEqual(readQuizRoute('#konto'), { kind: 'account' })
   for (const hash of ['', '#', '#quizy']) assert.equal(readQuizRoute(hash).kind, 'catalog')
   for (const hash of ['#quiz/', '#quiz/%zz', '#unknown']) assert.equal(readQuizRoute(hash).kind, 'missing')
 })

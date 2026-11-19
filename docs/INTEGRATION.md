@@ -5,7 +5,7 @@ uruchamia aplikację. `docs/interface-preview.html` jest wyłącznie statycznym 
 
 ## Źródło danych
 
-Domyślnie działa wbudowany kwestionariusz. Aby zastąpić go zewnętrznym katalogiem:
+Domyślnie działa wbudowany katalog quizów i kwestionariusz. Aby zastąpić go zewnętrznym katalogiem:
 
 1. Autor bazy dostarcza dane w formacie z `DATA_FORMAT.md`.
 2. Ustaw `VITE_QUIZ_DATA_URL` w `.env.local` na adres pliku lub endpointu.
@@ -24,8 +24,7 @@ Wbudowane stwierdzenia są w `src/data/quizzes.js`, a ich przeliczenie w `src/da
 - `PageShell.jsx` zapewnia wspólny nagłówek, jedną kolumnę i odnośnik pomijający nawigację.
 - Trasy mają postać `#quizy` i `#quiz/<zakodowane-id>`. Odświeżenie nie wymaga przekierowań serwera.
 
-Nie ma dodatkowych zależności względem pobranego repozytorium. `App.css` importuje wspólny
-arkusz `styles/quiz.css`; usunięto globalne reguły startera kolidujące z właściwym widokiem.
+`App.css` importuje wspólny arkusz `styles/quiz.css`. Integrację Firebase opisano w [FIREBASE.md](FIREBASE.md).
 
 ## Zapis
 
@@ -55,9 +54,8 @@ Reset wymaga wyboru Zacznij od nowa / Jeszcze raz, a następnie potwierdzenia.
 Anulowanie zachowuje próbę. Nieudane usunięcie nie udaje udanego resetu i nie odblokowuje
 chronionego zapisu. Usuwany jest tylko klucz bieżącego quizu i wersji.
 
-Zapis dotyczy tej przeglądarki i tego samego adresu strony. Czyszczenie danych witryny
-usuwa postęp. Nie ma synchronizacji urządzeń ani równocześnie otwartych kart; ostatni udany
-zapis wygrywa. Jeśli w przyszłości pojawią się konta, dodaj identyfikator konta do klucza.
+Zapis gościa dotyczy tej przeglądarki i tego samego adresu strony. Czyszczenie danych witryny
+usuwa postęp. Po zalogowaniu aplikacja używa osobnego zapisu w Firestore pod identyfikatorem konta.
 
 ## Sprawdzenie
 

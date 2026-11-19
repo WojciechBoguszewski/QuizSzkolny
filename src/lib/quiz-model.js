@@ -44,11 +44,17 @@ export function parseQuizCatalog(payload) {
       if (correctOptionId !== null && !options.some((option) => option.id === correctOptionId)) {
         throw new TypeError('The correct option must exist in the question.')
       }
+      const points = question.points ?? 1
+      if (!Number.isSafeInteger(points) || points < 1 || points > 100) {
+        throw new TypeError('Question points must be an integer from 1 to 100.')
+      }
       return {
         id: text(question.id, 'question ID'),
         text: text(question.text, 'question text'),
         options,
         correctOptionId,
+        points,
+        skill: optionalText(question.skill, 'skill'),
         explanation: optionalText(question.explanation, 'explanation'),
       }
     }), 'question')
@@ -61,6 +67,10 @@ export function parseQuizCatalog(payload) {
       questions,
     }
   }), 'quiz')
+}
+
+export function quizSaveKey(quiz) {
+  return `quizszkolny:progress:${encodeURIComponent(quiz.id)}:${encodeURIComponent(quiz.revision)}`
 }
 
 export function createQuizStore(quiz, options = {}) {
@@ -81,7 +91,7 @@ export function createQuizStore(quiz, options = {}) {
 
   return createQuizProgressStore({
     ...options,
-    key: `quizszkolny:progress:${encodeURIComponent(quiz.id)}:${encodeURIComponent(quiz.revision)}`,
+    key: quizSaveKey(quiz),
     version: 1,
     initialProgress: {
       questionIndex: 0,
@@ -106,8 +116,26 @@ export function scoreQuiz(quiz, progress) {
       : answer.id === correctAnswer.id ? 'correct' : 'incorrect'
     return { question, answer, correctAnswer, status }
   })
+  const skills = new Map()
+  let points = 0
+  let maxPoints = 0
+  for (const { question, correctAnswer, status } of rows) {
+    if (correctAnswer === null) continue
+    const skill = question.skill || quiz.subject || 'Wynik ogólny'
+    const totals = skills.get(skill) ?? { name: skill, points: 0, max: 0 }
+    totals.max += question.points
+    maxPoints += question.points
+    if (status === 'correct') {
+      totals.points += question.points
+      points += question.points
+    }
+    skills.set(skill, totals)
+  }
   return {
     rows,
+    points,
+    maxPoints,
+    skills: [...skills.values()],
     answered: rows.filter((row) => row.answer !== null).length,
     graded: rows.filter((row) => row.correctAnswer !== null).length,
     correct: rows.filter((row) => row.status === 'correct').length,

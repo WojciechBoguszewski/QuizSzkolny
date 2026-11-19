@@ -53,6 +53,7 @@
 }
 
 .qs-brand { color: var(--ink); font-weight: 700; text-decoration: none; }
+.qs-header nav { display: flex; flex-wrap: wrap; gap: .75rem; }
 .qs-header-link { padding-block: .7rem; }
 .qs-main { padding-top: clamp(1.5rem, 5vw, 3rem); }
 .qs-main:focus, .qs-main :where(h1, h2):focus { outline: none; }
@@ -74,7 +75,7 @@
 
 .qs-question__meta > :first-child { min-width: 0; overflow-wrap: anywhere; }
 .qs-question__count { flex-shrink: 0; }
-.qs-question__count, .qs-number, .qs-score-table td { font-variant-numeric: tabular-nums; }
+.qs-question__count, .qs-number, .qs-score-label { font-variant-numeric: tabular-nums; }
 .qs-section-label { margin-bottom: .5rem; overflow-wrap: anywhere; }
 
 .qs-page-intro, .qs-question__meta, .qs-question__hint, .qs-section-label,
@@ -175,10 +176,25 @@
 
 .qs-result { margin: 1rem 0; }
 .qs-result-number { font-size: 2rem; font-weight: 700; }
-.qs-score-table { width: 100%; margin: 1rem 0 1.25rem; border-collapse: collapse; text-align: left; }
-.qs-score-table :where(th, td) { padding: .4rem 0; border-bottom: 1px solid var(--line); }
-.qs-score-table th[scope='row'] { font-weight: 400; overflow-wrap: anywhere; }
-.qs-score-table :where(td, th:last-child) { padding-left: .5rem; text-align: right; white-space: nowrap; }
+.qs-score-chart { margin-block: 1.25rem; }
+.qs-score-chart h2 { font-size: 1.15rem; }
+.qs-score-chart ul { display: grid; gap: .85rem; margin: .75rem 0 0; padding: 0; list-style: none; }
+.qs-score-label { display: flex; justify-content: space-between; gap: .75rem; font-size: .95rem; }
+.qs-score-label > :last-child { flex-shrink: 0; color: var(--muted); }
+.qs-score-track { height: .65rem; margin-top: .3rem; background: var(--line); }
+.qs-score-track > div { height: 100%; background: var(--accent); }
+
+.qs-account-form { display: grid; gap: 1rem; max-width: 28rem; margin-top: 1.25rem; }
+.qs-account-form label { display: grid; gap: .3rem; }
+.qs-account-form input {
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: .5rem;
+  border: 1px solid var(--muted);
+  border-radius: .25rem;
+}
+.qs-account-form .qs-button { justify-self: start; }
+.qs-account-links { display: flex; flex-wrap: wrap; gap: 0 1rem; margin-top: .5rem; }
 
 .qs-review { border-block: 1px solid var(--line); }
 .qs-review summary { padding: .75rem 0; color: var(--accent); cursor: pointer; }
@@ -193,5 +209,7 @@
 .qs-reset .qs-feedback { margin-top: .5rem; }
 
 @media (forced-colors: active) {
+  .qs-score-track { border: 1px solid CanvasText; }
+  .qs-score-track > div { background: Highlight; forced-color-adjust: none; }
   .qs-option:has(input:checked) { outline: 1px solid Highlight; }
 }

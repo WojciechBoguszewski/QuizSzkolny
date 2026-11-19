@@ -7,21 +7,22 @@ const data = { quizzes: [{ id: 'test', title: 'Test', questions: [{
   id: 'q1', text: 'Treść kontrolna', options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }],
 }] }] }
 
-test('the built-in questionnaire opens without configuration or a network request', async () => {
+test('the built-in catalog opens without configuration or a network request', async () => {
   const { status, quizzes } = await loadQuizCatalog({
     url: '   ',
     request: () => { throw new Error('Unexpected request') },
   })
   assert.equal(status, 'ready')
-  assert.equal(quizzes.length, 1)
-  const [quiz] = quizzes
+  assert.deepEqual(quizzes.map(({ id }) => id), ['matematyka', 'informatyka', 'jezyk-polski', 'uzdolnienia'])
+  const quiz = quizzes.at(-1)
   assert.equal(quiz.id, 'uzdolnienia')
   assert.deepEqual(quiz.questions.map(({ id }) => Number(id)), Array.from({ length: 94 }, (_, i) => i + 1))
   assert.ok(quiz.questions.every(({ options }) => options.length === 5))
 })
 
 test('the questionnaire totals all 13 categories and reverses the four marked statements', async () => {
-  const { quizzes: [quiz] } = await loadQuizCatalog()
+  const { quizzes } = await loadQuizCatalog()
+  const quiz = quizzes.at(-1)
   const answers = Object.fromEntries(quiz.questions.map(({ id }) => [id, '4']))
   const results = scoreAptitudeQuiz(answers)
   assert.equal(results.length, 13)

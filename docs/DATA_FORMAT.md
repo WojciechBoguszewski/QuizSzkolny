@@ -1,7 +1,7 @@
 # Kontrakt źródła quizów
 
 Ten format dotyczy opcjonalnego katalogu JSON z adresu `VITE_QUIZ_DATA_URL`.
-Przy pustym ustawieniu aplikacja używa wbudowanego kwestionariusza.
+Przy pustym ustawieniu aplikacja używa wbudowanych quizów i kwestionariusza.
 
 Oczekiwana odpowiedź:
 
@@ -23,6 +23,8 @@ Oczekiwana odpowiedź:
             { "id": "b", "text": "Treść drugiej odpowiedzi" }
           ],
           "correctOptionId": "b",
+          "points": 2,
+          "skill": "Procenty",
           "explanation": "Opcjonalne wyjaśnienie po zakończeniu"
         }
       ]
@@ -42,9 +44,11 @@ To opis formatu, nie plik danych używany przez stronę.
 | `subject`, `description`, `explanation` | Opcjonalne teksty; mogą być puste. |
 | `questions` | Co najmniej jedno pytanie. |
 | `options` | Co najmniej dwie opcje. |
+| `points` | Opcjonalna liczba całkowita 1–100. Domyślnie 1. |
+| `skill` | Opcjonalna etykieta umiejętności używana na wykresie. |
 | `correctOptionId` | Opcjonalne ID istniejącej opcji. Brak lub `null` oznacza pytanie bez oceniania. |
 
-Wynik liczy poprawne odpowiedzi tylko dla pytań z kluczem. Gdy kluczy nie ma,
+Wynik sumuje punkty z poprawnych odpowiedzi. Tylko pytania z kluczem wpływają na wykres. Gdy kluczy nie ma,
 strona pokazuje liczbę udzielonych odpowiedzi i nie przypisuje im poprawności.
 Wyjaśnienia i klucz są prezentowane po zakończeniu próby.
 

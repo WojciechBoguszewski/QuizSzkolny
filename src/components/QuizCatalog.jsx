@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createQuizStore } from '../lib/quiz-model.js'
+import { createQuizStore, quizSaveKey } from '../lib/quiz-model.js'
 import { quizHref } from '../lib/quiz-routing.js'
 
 function questionCount(count) {
@@ -8,7 +8,7 @@ function questionCount(count) {
   return `${count} pytań`
 }
 
-export default function QuizCatalog({ catalog, onRetry }) {
+export default function QuizCatalog({ catalog, records, onRetry }) {
   const heading = useRef(null)
   useEffect(() => { heading.current?.focus({ preventScroll: true }) }, [])
 
@@ -27,7 +27,8 @@ export default function QuizCatalog({ catalog, onRetry }) {
       {catalog.status === 'ready' && catalog.quizzes.length > 0 && (
         <ul className="qs-quiz-list">
           {catalog.quizzes.map((quiz) => {
-            const { progress, saveStatus } = createQuizStore(quiz).getSnapshot()
+            const storage = records ? { getItem: () => records.get(quizSaveKey(quiz)) ?? null } : undefined
+            const { progress, saveStatus } = createQuizStore(quiz, { storage }).getSnapshot()
             const answered = Object.keys(progress.answers).length
             const canResume = saveStatus === 'saved' && answered > 0
             const label = canResume ? progress.finished ? 'Zobacz wynik' : 'Kontynuuj' : 'Rozpocznij'
