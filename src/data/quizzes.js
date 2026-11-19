@@ -1,9 +1,4 @@
-export const QUIZZES = {
-  'geografia-polski': {
-    id: 'geografia-polski',
-    title: 'Geografia Polski',
-    description: 'Sprawdź swoją wiedzę o miastach i rzekach Polski.',
-    questions: [
+export const aptitudeQuestions = [
   {
     "id": 1,
     "text": "Interesują mnie wszelkie nowinki techniczne, dlatego systematycznie przeglądam strony internetowe lub czasopisma naukowe z tego zakresu",
@@ -364,12 +359,6 @@ export const QUIZZES = {
     "category": "sportowe",
     "isReversed": false
   },
- {
-    "id": 60,
-    "text": "Już od dzieciństwa przejawiam zainteresowanie wybraną dziedziną sportu i aktywnością ruchową",
-    "category": "sportowe",
-    "isReversed": false
-  },
   {
     "id": 61,
     "text": "Już we wczesnym dzieciństwie fascynowały mnie matematyczne zagadki, gry i logiczne problemy",
@@ -574,5 +563,4 @@ export const QUIZZES = {
     "category": "sportowe",
     "isReversed": false
   }
-]}};
- 
+]

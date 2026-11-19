@@ -1,7 +1,7 @@
 # Kontrakt źródła quizów
 
-Dane przygotowuje autor bazy. Aplikacja pobiera JSON z adresu `VITE_QUIZ_DATA_URL`.
-Nie ma wbudowanej bazy ani quizów demonstracyjnych.
+Ten format dotyczy opcjonalnego katalogu JSON z adresu `VITE_QUIZ_DATA_URL`.
+Przy pustym ustawieniu aplikacja używa wbudowanego kwestionariusza.
 
 Oczekiwana odpowiedź:
 

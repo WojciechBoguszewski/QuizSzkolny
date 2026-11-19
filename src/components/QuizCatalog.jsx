@@ -15,7 +15,6 @@ export default function QuizCatalog({ catalog, onRetry }) {
   return (
     <>
       <h1 className="qs-page-title" ref={heading} tabIndex={-1}>Quizy</h1>
-      <p className="qs-page-intro">Wybierz quiz. Do rozpoczętej próby możesz wrócić później.</p>
 
       {catalog.status === 'loading' && <p className="qs-empty" role="status">Wczytywanie quizów…</p>}
       {catalog.status === 'error' && (
@@ -24,7 +23,6 @@ export default function QuizCatalog({ catalog, onRetry }) {
           <button className="qs-button qs-button--secondary" onClick={onRetry}>Spróbuj ponownie</button>
         </div>
       )}
-      {catalog.status === 'not-configured' && <p className="qs-empty">Quizy nie są jeszcze dostępne.</p>}
       {catalog.status === 'ready' && catalog.quizzes.length === 0 && <p className="qs-empty">Brak dostępnych quizów.</p>}
       {catalog.status === 'ready' && catalog.quizzes.length > 0 && (
         <ul className="qs-quiz-list">

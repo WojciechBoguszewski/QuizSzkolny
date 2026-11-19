@@ -1,9 +1,10 @@
 import { parseQuizCatalog } from '../lib/quiz-model.js'
+import { aptitudeQuiz } from './aptitude-quiz.js'
 
-/** Configure a URL or replace this adapter with the real database client. */
 export async function loadQuizCatalog({ url, signal, request = globalThis.fetch } = {}) {
-  if (!url?.trim()) return { status: 'not-configured', quizzes: [] }
-  const response = await request(url, {
+  const source = url?.trim()
+  if (!source) return { status: 'ready', quizzes: [aptitudeQuiz] }
+  const response = await request(source, {
     signal,
     headers: { Accept: 'application/json' },
     credentials: 'same-origin',

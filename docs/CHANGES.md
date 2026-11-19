@@ -1,5 +1,7 @@
 # Zmiany projektu
 
+Poniżej opis prac nad wcześniejszą wersją, sprzed podłączenia kwestionariusza.
+
 ## Strona i wygląd
 
 | Before | After |

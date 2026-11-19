@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { aptitudeQuiz, scoreAptitudeQuiz } from '../data/aptitude-quiz.js'
 import { useQuizProgress } from '../hooks/useQuizProgress.js'
 import { advanceQuiz, createQuizStore, orderedQuestions, scoreQuiz } from '../lib/quiz-model.js'
 
@@ -60,6 +61,22 @@ function AnswerReview({ result }) {
   )
 }
 
+function AptitudeResults({ answers }) {
+  const results = scoreAptitudeQuiz(answers)
+  return (
+    <table className="qs-score-table">
+      <thead>
+        <tr><th scope="col">Kategoria</th><th scope="col">Punkty</th></tr>
+      </thead>
+      <tbody>
+        {results.map(({ name, points, max }) => (
+          <tr key={name}><th scope="row">{name}</th><td>{points} / {max}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
 export default function QuizSession({ quiz }) {
   const store = useMemo(() => createQuizStore(quiz), [quiz])
   const { progress, setProgress, resetProgress, retrySave, saveStatus } = useQuizProgress(store)
@@ -107,18 +124,21 @@ export default function QuizSession({ quiz }) {
 
   if (progress.finished) {
     const result = scoreQuiz(quiz, progress)
+    const isAptitudeQuiz = quiz === aptitudeQuiz
     return (
       <>
         <p className="qs-section-label">{quiz.title}</p>
-        <h1 className="qs-page-title" ref={heading} tabIndex={-1}>Quiz ukończony.</h1>
-        <div className="qs-result">
-          <p className="qs-result-number qs-number">
-            {result.graded > 0 ? result.correct : result.answered}<span> / {result.graded > 0 ? result.graded : result.total}</span>
-          </p>
-          <p className="qs-result-caption">{result.graded > 0
-            ? result.graded === result.total ? 'Poprawne odpowiedzi' : 'Poprawne odpowiedzi w pytaniach z kluczem'
-            : 'Udzielone odpowiedzi'}</p>
-        </div>
+        <h1 className="qs-page-title" ref={heading} tabIndex={-1}>{isAptitudeQuiz ? 'Wynik kwestionariusza' : 'Quiz ukończony.'}</h1>
+        {isAptitudeQuiz ? <AptitudeResults answers={progress.answers} /> : (
+          <div className="qs-result">
+            <p className="qs-result-number qs-number">
+              {result.graded > 0 ? result.correct : result.answered}<span> / {result.graded > 0 ? result.graded : result.total}</span>
+            </p>
+            <p className="qs-result-caption">{result.graded > 0
+              ? result.graded === result.total ? 'Poprawne odpowiedzi' : 'Poprawne odpowiedzi w pytaniach z kluczem'
+              : 'Udzielone odpowiedzi'}</p>
+          </div>
+        )}
         <AnswerReview result={result} />
         <div className="qs-actions">
           <a className="qs-button qs-button--ghost" href="#quizy">Wróć do quizów</a>
@@ -135,7 +155,7 @@ export default function QuizSession({ quiz }) {
       <div className="qs-question__meta">
         <p>{quiz.title}</p>
         <p className="qs-question__count" aria-label={`Pytanie ${progress.questionIndex + 1} z ${questions.length}`}>
-          <strong>{String(progress.questionIndex + 1).padStart(2, '0')}</strong> / {questions.length}
+          {progress.questionIndex + 1} / {questions.length}
         </p>
       </div>
       <h1 className="qs-question__title" id="question-title" ref={heading} tabIndex={-1}>{question.text}</h1>
@@ -143,11 +163,10 @@ export default function QuizSession({ quiz }) {
       <form onSubmit={(event) => { event.preventDefault(); setProgress(advanceQuiz) }}>
         <fieldset className="qs-options" aria-labelledby="question-title" aria-describedby="question-hint">
           <legend className="qs-sr-only">Odpowiedzi</legend>
-          {question.options.map((option, index) => (
+          {question.options.map((option) => (
             <label className="qs-option" key={option.id}>
               <input type="radio" name={`answer-${question.id}`} value={option.id} checked={selected === option.id}
                 onChange={() => setProgress((previous) => ({ ...previous, answers: { ...previous.answers, [question.id]: option.id } }))} />
-              <span className="qs-option__letter" aria-hidden="true">{index < 26 ? String.fromCharCode(65 + index) : index + 1}</span>
               <span className="qs-option__text">{option.text}</span>
             </label>
           ))}

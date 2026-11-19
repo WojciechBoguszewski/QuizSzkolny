@@ -1,61 +1,38 @@
 # QuizSzkolny
 
-Działający frontend React w zaakceptowanym minimalistycznym stylu: jedna kolumna,
-ciepła biel, szeryfowe pytania i odpowiedzi oddzielone liniami.
+Szkolny kwestionariusz uzdolnień. Zawiera 94 stwierdzenia, pięć odpowiedzi do wyboru
+i podsumowanie punktów w 13 kategoriach. Odpowiedzi i bieżące pytanie zapisują się
+w przeglądarce, więc próbę można dokończyć po odświeżeniu strony.
 
-Strona zawiera listę quizów, rozwiązywanie pytań, powrót do zapisanej próby, wynik,
-przegląd odpowiedzi i świadomy reset. Postęp zapisuje się od razu przy zmianie odpowiedzi
-lub pytania i jest odtwarzany po odświeżeniu, także po ukończeniu quizu.
+Punktacja skali IZiU pochodzi z rozdziału 7.1.1 publikacji
+[„Zdolny, ale jak?”](https://repozytorium.uwb.edu.pl/jspui/handle/11320/3449).
+Podsumowanie pokazuje sumy punktów w kategoriach.
 
 ## Uruchomienie
+
+Wymagany jest Node.js 24.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Bez skonfigurowanego źródła aplikacja pokazuje, że quizy nie są jeszcze dostępne.
-Repozytorium nie zawiera własnej bazy pytań. Dane dostarcza osobny moduł.
-
-## Podłączenie bazy
-
-Skopiuj `.env.example` do `.env.local` i ustaw publiczny adres źródła JSON:
-
-```text
-VITE_QUIZ_DATA_URL=/quizzes.json
-```
-
-To może być plik przygotowany przez autora bazy w `public/` lub endpoint HTTP.
-Po zmianie ustawienia uruchom serwer ponownie. Przy budowie produkcyjnej ustawienie
-jest odczytywane w trakcie `npm run build`.
-
-Format danych opisano w [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
-Jeśli baza ma inne API, zmień wyłącznie adapter `src/data/quiz-source.js`, aby zwracał
-opisany model. Widoki nie zależą od technologii bazy.
-
-## Sprawdzenie i budowa
+## Sprawdzenie i publikacja
 
 ```sh
 npm test
+npm run lint
 npm run build
 npm run preview
 ```
 
-Budowa tworzy `dist/`. Względne ścieżki zasobów i nawigacja przez hash obsługują
-hosting statyczny także w podkatalogu.
+W ustawieniach repozytorium wybierz **Settings → Pages → Source → GitHub Actions**.
+Automatyzacja **GitHub Pages** testuje i buduje projekt po zmianach na `main`,
+a następnie publikuje katalog `dist/`. Można ją również uruchomić ręcznie z karty **Actions**.
 
-## Najważniejsze pliki
+## Inne źródło danych
 
-| Plik | Odpowiedzialność |
-| --- | --- |
-| `src/App.jsx` | Wczytanie katalogu i wybór widoku |
-| `src/components/QuizCatalog.jsx` | Lista, wznowienie próby i stany danych |
-| `src/components/QuizSession.jsx` | Pytanie, wynik, przegląd odpowiedzi i reset |
-| `src/data/quiz-source.js` | Adapter źródła pytań |
-| `src/lib/quiz-model.js` | Walidacja danych, kolejności, próby i wynik |
-| `src/lib/quiz-progress.js` | Synchroniczny zapis i odczyt `localStorage` |
-| `src/styles/quiz.css` | Wspólny styl wszystkich widoków |
-
-Szczegóły połączenia z bazą i ograniczenia zapisu: [docs/INTEGRATION.md](docs/INTEGRATION.md).
-Pełna lista zmian: [docs/CHANGES.md](docs/CHANGES.md).
-`docs/interface-preview.html` pozostaje statycznym wzorcem zatwierdzonego wyglądu.
+Wbudowany kwestionariusz działa bez konfiguracji. Aby wyświetlić inny katalog, ustaw
+`VITE_QUIZ_DATA_URL` w pliku `.env.local` przed uruchomieniem lub budową aplikacji.
+Przy hostowaniu w podkatalogu podawaj pełny adres źródła albo ścieżkę względną
+wobec strony. Format opisano w [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).

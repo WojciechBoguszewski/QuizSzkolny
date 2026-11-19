@@ -5,6 +5,8 @@ uruchamia aplikację. `docs/interface-preview.html` jest wyłącznie statycznym 
 
 ## Źródło danych
 
+Domyślnie działa wbudowany kwestionariusz. Aby zastąpić go zewnętrznym katalogiem:
+
 1. Autor bazy dostarcza dane w formacie z `DATA_FORMAT.md`.
 2. Ustaw `VITE_QUIZ_DATA_URL` w `.env.local` na adres pliku lub endpointu.
 3. Uruchom ponownie `npm run dev`; dla produkcji wykonaj `npm run build` z tym ustawieniem.
@@ -12,11 +14,8 @@ uruchamia aplikację. `docs/interface-preview.html` jest wyłącznie statycznym 
 Jeżeli baza wymaga innego klienta lub mapowania, zmień `src/data/quiz-source.js`.
 Funkcja `loadQuizCatalog({ url, signal })` ma zwracać `{ status: 'ready', quizzes }`
 z danymi zwalidowanymi przez `parseQuizCatalog`. Sygnalizuj błędy wyjątkiem i respektuj
-`AbortSignal`. Brak konfiguracji ma własny stan `not-configured`; prawidłowe puste dane
-mają stan `ready` z pustą tablicą.
-
-Nie dodano pytań, bazy danych, kont ani serwera. Dane kontrolne użyte do testów przeglądarkowych
-pozostają poza repozytorium i paczką strony.
+`AbortSignal`. Prawidłowe puste dane mają stan `ready` z pustą tablicą.
+Wbudowane stwierdzenia są w `src/data/quizzes.js`, a ich przeliczenie w `src/data/aptitude-quiz.js`.
 
 ## Widoki
 

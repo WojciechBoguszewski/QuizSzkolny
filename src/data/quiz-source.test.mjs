@@ -1,14 +1,36 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadQuizCatalog } from './quiz-source.js'
+import { scoreAptitudeQuiz } from './aptitude-quiz.js'
 
 const data = { quizzes: [{ id: 'test', title: 'Test', questions: [{
   id: 'q1', text: 'Treść kontrolna', options: [{ id: 'a', text: 'A' }, { id: 'b', text: 'B' }],
 }] }] }
 
-test('unconfigured data is explicit and does not make a network request', async () => {
-  const result = await loadQuizCatalog({ request: () => { throw new Error('Unexpected request') } })
-  assert.equal(result.status, 'not-configured')
+test('the built-in questionnaire opens without configuration or a network request', async () => {
+  const { status, quizzes } = await loadQuizCatalog({
+    url: '   ',
+    request: () => { throw new Error('Unexpected request') },
+  })
+  assert.equal(status, 'ready')
+  assert.equal(quizzes.length, 1)
+  const [quiz] = quizzes
+  assert.equal(quiz.id, 'uzdolnienia')
+  assert.deepEqual(quiz.questions.map(({ id }) => Number(id)), Array.from({ length: 94 }, (_, i) => i + 1))
+  assert.ok(quiz.questions.every(({ options }) => options.length === 5))
+})
+
+test('the questionnaire totals all 13 categories and reverses the four marked statements', async () => {
+  const { quizzes: [quiz] } = await loadQuizCatalog()
+  const answers = Object.fromEntries(quiz.questions.map(({ id }) => [id, '4']))
+  const results = scoreAptitudeQuiz(answers)
+  assert.equal(results.length, 13)
+  assert.equal(results.reduce((sum, { max }) => sum + max, 0), 376)
+  assert.deepEqual(results.filter(({ points, max }) => points !== max), [
+    { name: 'Przywódcze', points: 24, max: 32 },
+    { name: 'Językowe', points: 28, max: 32 },
+    { name: 'Literackie', points: 24, max: 28 },
+  ])
 })
 
 test('the adapter reads and validates the configured source', async () => {
