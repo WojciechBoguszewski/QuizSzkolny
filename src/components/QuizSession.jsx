@@ -1,30 +1,44 @@
 import { useEffect, useRef, useState } from 'react'
-import { aptitudeDemo, scoreAptitudeQuiz } from '../data/aptitude-quiz.js'
+import { scoreAptitudeQuiz } from '../data/aptitude-quiz.js'
 import { advanceQuiz, orderedQuestions, scoreQuiz } from '../lib/quiz-model.js'
 import ScoreChart from './ScoreChart.jsx'
 
 function ResetConfirmation({ onConfirm, onCancel, pending }) {
-  const heading = useRef(null)
+  const dialog = useRef(null)
   const [failed, setFailed] = useState(false)
-  useEffect(() => { heading.current?.focus({ preventScroll: true }) }, [])
+
+  useEffect(() => {
+    const element = dialog.current
+    const opener = document.activeElement
+    element.showModal()
+    return () => {
+      element.close()
+      if (opener?.isConnected) opener.focus({ preventScroll: true })
+    }
+  }, [])
+
   return (
-    <section className="qs-reset" aria-labelledby="reset-title">
-      <h2 id="reset-title" ref={heading} tabIndex={-1}>Rozpocząć od nowa?</h2>
-      <p>Usunie to zapisane odpowiedzi z tej próby.</p>
-      {failed && <p className="qs-feedback" data-state="error" role="alert">Nie udało się usunąć zapisu. Poprzednia próba została zachowana.</p>}
-      <div className="qs-actions">
+    <dialog className="qs-confirm" ref={dialog} role="alertdialog" aria-labelledby="restart-title"
+      aria-describedby="restart-summary" onCancel={(event) => {
+        event.preventDefault()
+        if (!pending) onCancel()
+      }}>
+      <h2 id="restart-title">Rozpocząć od nowa?</h2>
+      <p id="restart-summary">Zapisane odpowiedzi z tej próby zostaną usunięte.</p>
+      {failed && <p className="qs-confirm-error" role="alert">Nie udało się usunąć zapisu. Spróbuj ponownie.</p>}
+      <div className="qs-confirm-actions">
         <button type="button" className="qs-button qs-button--ghost" disabled={pending} onClick={onCancel}>Anuluj</button>
         <button type="button" className="qs-button qs-button--primary" disabled={pending} onClick={async () => {
           setFailed(false)
           if (!await onConfirm()) setFailed(true)
-        }}>{pending ? 'Resetowanie…' : 'Rozpocznij od nowa'}</button>
+        }}>{pending ? 'Resetowanie…' : 'Zacznij od nowa'}</button>
       </div>
-    </section>
+    </dialog>
   )
 }
 
-function SaveNotice({ status, onRetry, onRestart, canRestart, restartRef, isCloud }) {
-  if (status === 'ready' && !canRestart) return null
+function SaveNotice({ status, onRetry, isCloud, disabled }) {
+  if (status === 'ready') return null
   return (
     <div className="qs-save-line">
       <p className="qs-save-status" data-state={status === 'unavailable' ? 'error' : undefined}
@@ -33,10 +47,7 @@ function SaveNotice({ status, onRetry, onRestart, canRestart, restartRef, isClou
         {status === 'saved' && (isCloud ? 'Postęp zapisany na koncie.' : 'Postęp zapisany w tej przeglądarce.')}
         {status === 'unavailable' && 'Nie udało się zapisać postępu. Spróbuj ponownie.'}
       </p>
-      <div className="qs-save-actions">
-        {status === 'unavailable' && <button type="button" className="qs-text-button" onClick={onRetry}>Ponów zapis</button>}
-        {canRestart && <button type="button" className="qs-text-button" onClick={onRestart} ref={restartRef}>Zacznij od nowa</button>}
-      </div>
+      {status === 'unavailable' && <button type="button" className="qs-text-button" disabled={disabled} onClick={onRetry}>Ponów zapis</button>}
     </div>
   )
 }
@@ -45,7 +56,7 @@ function AnswerReview({ result }) {
   return (
     <details className="qs-review">
       <summary>Przejrzyj odpowiedzi</summary>
-      <ol>
+      <ol tabIndex={0} aria-label="Odpowiedzi z tej próby">
         {result.rows.map(({ question, answer, correctAnswer, status }, index) => (
           <li key={question.id}>
             <p className="qs-review-number">
@@ -70,7 +81,6 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
   const [confirmRestart, setConfirmRestart] = useState(false)
   const [restartPending, setRestartPending] = useState(false)
   const heading = useRef(null)
-  const restartButton = useRef(null)
   const [protectedSave, setProtectedSave] = useState(() => saveStatus === 'invalid' || saveStatus === 'incompatible')
   const blocked = protectedSave || saveStatus === 'invalid' || saveStatus === 'incompatible'
   const questions = orderedQuestions(quiz, progress)
@@ -83,7 +93,7 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
     window.scrollTo(0, 0)
   }, [progress.questionIndex, progress.finished, blocked])
 
-  const restart = async () => {
+  async function restart() {
     setRestartPending(true)
     const reset = await resetProgress()
     setRestartPending(false)
@@ -93,10 +103,12 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
     heading.current?.focus({ preventScroll: true })
     return true
   }
-  const cancelRestart = () => {
-    setConfirmRestart(false)
-    restartButton.current?.focus({ preventScroll: true })
-  }
+
+  const startRestart = () => setConfirmRestart(true)
+  const confirmation = confirmRestart && (
+    <ResetConfirmation onConfirm={restart} onCancel={() => setConfirmRestart(false)} pending={restartPending} />
+  )
+  const saveNotice = <SaveNotice status={saveStatus} onRetry={retrySave} isCloud={isCloud} disabled={restartPending} />
 
   if (blocked) {
     return (
@@ -106,9 +118,9 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
         <p className="qs-page-intro">Poprzedni zapis nie pasuje do tej wersji quizu lub jest uszkodzony. Został zachowany.</p>
         <div className="qs-actions">
           <a className="qs-button qs-button--ghost" href="#quizy">Wróć na start</a>
-          <button type="button" className="qs-button qs-button--primary" ref={restartButton} onClick={() => setConfirmRestart(true)}>Zacznij od nowa</button>
+          <button type="button" className="qs-button qs-button--primary" disabled={restartPending} onClick={startRestart}>Zacznij od nowa</button>
         </div>
-        {confirmRestart && <ResetConfirmation onConfirm={restart} onCancel={cancelRestart} pending={restartPending} />}
+        {confirmation}
       </>
     )
   }
@@ -116,13 +128,15 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
   if (progress.finished) {
     const result = scoreQuiz(quiz, progress)
     const aptitudeScores = scoreAptitudeQuiz(quiz, progress.answers)
-    const resultLabel = aptitudeScores
-      ? quiz === aptitudeDemo ? 'Wersja pokazowa · 20 pytań' : 'Pełna wersja · 94 pytania'
-      : quiz.title
     return (
       <>
-        <p className="qs-section-label">{resultLabel}</p>
-        <h1 className="qs-page-title" ref={heading} tabIndex={-1}>{aptitudeScores ? 'Wynik kwestionariusza' : 'Quiz ukończony.'}</h1>
+        {!aptitudeScores && <p className="qs-section-label">{quiz.title}</p>}
+        <div className="qs-result-heading">
+          <h1 className="qs-page-title" ref={heading} tabIndex={-1}>{aptitudeScores ? 'Wynik kwestionariusza' : 'Quiz ukończony.'}</h1>
+          <button type="button" className="qs-text-button" disabled={restartPending} onClick={startRestart}>Zrób jeszcze raz</button>
+        </div>
+        {saveNotice}
+        <AnswerReview result={result} />
         {aptitudeScores ? <ScoreChart scores={aptitudeScores} title="Wynik według kategorii" /> : (
           <div className="qs-result">
             <p className="qs-result-number qs-number">
@@ -135,13 +149,7 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
           </div>
         )}
         {result.skills.length > 0 && <ScoreChart scores={result.skills} title="Wynik według umiejętności" />}
-        <AnswerReview result={result} />
-        <div className="qs-actions">
-          <a className="qs-button qs-button--ghost" href="#quizy">Wróć na start</a>
-          <button type="button" className="qs-button qs-button--primary" ref={restartButton} onClick={() => setConfirmRestart(true)}>Jeszcze raz</button>
-        </div>
-        <SaveNotice status={saveStatus} onRetry={retrySave} canRestart={false} isCloud={isCloud} />
-        {confirmRestart && <ResetConfirmation onConfirm={restart} onCancel={cancelRestart} pending={restartPending} />}
+        {confirmation}
       </>
     )
   }
@@ -150,20 +158,24 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
     <>
       <div className="qs-question__meta">
         <p>{quiz.title}</p>
-        <p className="qs-question__count" aria-label={`Pytanie ${progress.questionIndex + 1} z ${questions.length}`}>
-          {progress.questionIndex + 1} / {questions.length}
-        </p>
+        <div className="qs-question__tools">
+          {answered > 0 && <button type="button" className="qs-text-button" disabled={restartPending} onClick={startRestart}>Zacznij od nowa</button>}
+          <p className="qs-question__count" aria-label={`Pytanie ${progress.questionIndex + 1} z ${questions.length}`}>
+            {progress.questionIndex + 1} / {questions.length}
+          </p>
+        </div>
       </div>
       <div className="qs-question__progress" aria-hidden="true">
         <div style={{ width: `${100 * (progress.questionIndex + 1) / questions.length}%` }} />
       </div>
+      {saveStatus === 'unavailable' && saveNotice}
       <h1 className="qs-question__title" id="question-title" ref={heading} tabIndex={-1}>{question.text}</h1>
       <p className="qs-question__hint" id="question-hint">
         {question.correctOptionId !== null && `${question.skill ? question.skill + ' · ' : ''}${question.points} pkt. `}
         Wybierz jedną odpowiedź.
       </p>
       <form onSubmit={(event) => { event.preventDefault(); setProgress(advanceQuiz) }}>
-        <fieldset className="qs-options" disabled={confirmRestart} aria-labelledby="question-title" aria-describedby="question-hint">
+        <fieldset className="qs-options" disabled={restartPending} aria-labelledby="question-title" aria-describedby="question-hint">
           <legend className="qs-sr-only">Odpowiedzi</legend>
           {question.options.map((option) => (
             <label className="qs-option" key={option.id}>
@@ -174,16 +186,15 @@ export default function QuizSession({ quiz, attempt, isCloud }) {
           ))}
         </fieldset>
         <div className="qs-actions">
-          <button type="button" className="qs-button qs-button--ghost" disabled={confirmRestart || progress.questionIndex === 0}
+          <button type="button" className="qs-button qs-button--ghost" disabled={restartPending || progress.questionIndex === 0}
             onClick={() => setProgress((previous) => ({ ...previous, questionIndex: previous.questionIndex - 1 }))}>Wstecz</button>
-          <button type="submit" className="qs-button qs-button--primary" disabled={confirmRestart || selected === undefined}>
+          <button type="submit" className="qs-button qs-button--primary" disabled={restartPending || selected === undefined}>
             {progress.questionIndex === questions.length - 1 ? 'Zakończ' : 'Dalej'}
           </button>
         </div>
       </form>
-      <SaveNotice status={saveStatus} onRetry={retrySave} onRestart={() => setConfirmRestart(true)}
-        canRestart={answered > 0} restartRef={restartButton} isCloud={isCloud} />
-      {confirmRestart && <ResetConfirmation onConfirm={restart} onCancel={cancelRestart} pending={restartPending} />}
+      {saveStatus !== 'unavailable' && saveNotice}
+      {confirmation}
     </>
   )
 }

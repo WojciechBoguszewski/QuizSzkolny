@@ -1,7 +1,7 @@
 import { parseQuizCatalog } from '../lib/quiz-model.js'
-import { aptitudeDemo, aptitudeQuiz } from './aptitude-quiz.js'
+import { aptitudeQuiz } from './aptitude-quiz.js'
 
-const builtInQuizzes = [aptitudeDemo, aptitudeQuiz]
+const builtInQuizzes = [aptitudeQuiz]
 
 export async function loadQuizCatalog({ url, signal, request = globalThis.fetch } = {}) {
   const source = url?.trim()

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { aptitudeDemo, aptitudeQuiz } from '../data/aptitude-quiz.js'
 import { createQuizStore, quizSaveKey } from '../lib/quiz-model.js'
 import { quizHref } from '../lib/quiz-routing.js'
 
@@ -18,28 +17,27 @@ function quizStatus(quiz, records) {
   return { label: 'Kontynuuj', resumable: true, answered }
 }
 
-function DemoHome({ heading, records }) {
-  const status = quizStatus(aptitudeDemo, records)
+function QuizHome({ heading, quiz, records }) {
+  const status = quizStatus(quiz, records)
   return (
     <section className="qs-home">
-      <p className="qs-home-meta">Wersja pokazowa · {questionCount(aptitudeDemo.questions.length)}</p>
-      <h1 ref={heading} tabIndex={-1}>{aptitudeDemo.title}</h1>
-      <p className="qs-home-description">{aptitudeDemo.description}</p>
+      <p className="qs-home-meta">{questionCount(quiz.questions.length)}</p>
+      <h1 ref={heading} tabIndex={-1}>{quiz.title}</h1>
+      {quiz.description && <p className="qs-home-description">{quiz.description}</p>}
       <div className="qs-home-start">
-        <a className="qs-button qs-button--primary" href={quizHref(aptitudeDemo.id)}>{status.label}</a>
-        {status.resumable && <p className="qs-quiz-resume qs-number">Zapisano {status.answered} / {aptitudeDemo.questions.length} odpowiedzi</p>}
+        <a className="qs-button qs-button--primary" href={quizHref(quiz.id)}>{status.label}</a>
+        {status.resumable && <p className="qs-quiz-resume qs-number">Zapisano {status.answered} / {quiz.questions.length} odpowiedzi</p>}
       </div>
-      <a className="qs-home-full" href={quizHref(aptitudeQuiz.id)}>Pełny kwestionariusz · {questionCount(aptitudeQuiz.questions.length)}</a>
     </section>
   )
 }
 
 export default function QuizCatalog({ catalog, records, onRetry }) {
   const heading = useRef(null)
-  const demoHome = catalog.quizzes[0] === aptitudeDemo
-  useEffect(() => { heading.current?.focus({ preventScroll: true }) }, [demoHome])
+  const singleQuiz = catalog.quizzes.length === 1 ? catalog.quizzes[0] : null
+  useEffect(() => { heading.current?.focus({ preventScroll: true }) }, [singleQuiz])
 
-  if (demoHome) return <DemoHome heading={heading} records={records} />
+  if (singleQuiz) return <QuizHome heading={heading} quiz={singleQuiz} records={records} />
 
   return (
     <>

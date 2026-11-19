@@ -32,7 +32,7 @@ export function useFirebaseAccount() {
       if (!active) return
       unsubscribe = client.observeUser((user) => {
         if (active) setAccount({ status: 'ready', client, user })
-      }).catch(showFailure)
+      }, showFailure)
     }).catch(showFailure)
 
     return () => {

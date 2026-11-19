@@ -50,7 +50,7 @@ nie ma drugiej kopii próby w `useState`.
 | `unavailable` | Próba działa w pamięci; wyraźny błąd i przycisk Ponów zapis. |
 | `invalid` / `incompatible` | Poprzedni zapis jest chroniony. Interakcja wymaga świadomego rozpoczęcia od nowa. |
 
-Reset wymaga wyboru Zacznij od nowa / Jeszcze raz, a następnie potwierdzenia.
+Reset wymaga wyboru **Zacznij od nowa** albo **Zrób jeszcze raz** i potwierdzenia w oknie nad stroną.
 Anulowanie zachowuje próbę. Nieudane usunięcie nie udaje udanego resetu i nie odblokowuje
 chronionego zapisu. Usuwany jest tylko klucz bieżącego quizu i wersji.
 
